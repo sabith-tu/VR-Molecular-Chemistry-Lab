@@ -56,6 +56,7 @@
   <Project Path="Unity.Multiplayer.Center.Common.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Unity.XR.Interaction.Toolkit.Analytics.Editor.csproj" />
+  <Project Path="Assembly-CSharp-firstpass.csproj" />
   <Project Path="Unity.XR.Management.Editor.csproj" />
   <Project Path="Unity.XR.OpenXR.Features.MetaQuestSupport.Editor.csproj" />
   <Project Path="Unity.InputSystem.ForUI.csproj" />
