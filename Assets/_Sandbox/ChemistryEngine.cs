@@ -135,6 +135,7 @@ public class ChemistryEngine : MonoBehaviour
             if (CanFormMolecule(candidateAtoms, molecule, out List<AtomController> atomsToConsume))
             {
                 UpdatePreviews(molecule, atomsToConsume);
+                AudioManager.Instance.PlaySnap(atomsToConsume[0].transform.position);
                 return;
             }
         }
@@ -209,6 +210,11 @@ public class ChemistryEngine : MonoBehaviour
         // Clear the memory
         pendingAtomsToConsume.Clear();
         pendingMolecule = null;
+    }
+
+    public void ResetAllMolecules()
+    {
+        MoleculeController.allMoleculeControllers.ToList().ForEach(item => item?.BreakApart());
     }
 
     // --- UPDATED: Spawning ---

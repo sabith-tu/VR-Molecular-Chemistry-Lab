@@ -38,13 +38,15 @@ public class MoleculeUI : MonoBehaviour
             transform.position = parentMolecule.transform.position + (Vector3.up * heightOffset);
         }
 
-        // 2. Rotate it to face the player's VR headset
+        // 2. Rotate it to face the player's VR headset around the world Y axis only
         if (vrCamera != null)
         {
-            transform.LookAt(
-                transform.position + vrCamera.rotation * Vector3.forward,
-                vrCamera.rotation * Vector3.up
-            );
+            Vector3 lookDirection = vrCamera.position - transform.position;
+            lookDirection.y = 0f;
+            if (lookDirection.sqrMagnitude > 0.001f)
+            {
+                transform.rotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+            }
         }
     }
 }

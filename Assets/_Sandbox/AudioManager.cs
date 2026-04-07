@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class AudioManager : MonoBehaviour
@@ -34,9 +35,21 @@ public class AudioManager : MonoBehaviour
             AudioSource.PlayClipAtPoint(sfx_break, position);
     }
 
+    bool canPlaySnapSoundAgain = true;
+
     public void PlaySnap(Vector3 position)
     {
-        if (sfx_snap != null)
+        if (sfx_snap != null && canPlaySnapSoundAgain)
+        {
+            canPlaySnapSoundAgain = false;
             AudioSource.PlayClipAtPoint(sfx_snap, position);
+            StartCoroutine(SubRoutine());
+        }
+
+        IEnumerator SubRoutine()
+        {
+            yield return new WaitForSeconds(0.5f);
+            canPlaySnapSoundAgain = true;
+        }
     }
 }

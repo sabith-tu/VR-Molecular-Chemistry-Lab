@@ -1,14 +1,20 @@
+using System.Collections.Generic;
 using UnityEngine;
-
 
 public class MoleculeController : MonoBehaviour
 {
     public MoleculeSO moleculeData;
+    public static List<MoleculeController> allMoleculeControllers = new();
+
+    void OnEnable() => allMoleculeControllers.Add(this);
+
+    void OnDisable() => allMoleculeControllers.Remove(this);
 
     public void BreakApart()
     {
         // 1. Check if it's currently held and force the hand to drop it
-        UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable grabInteractable = GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+        UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable grabInteractable =
+            GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
         if (grabInteractable != null && grabInteractable.isSelected)
         {
             grabInteractable.interactionManager.CancelInteractableSelection(
