@@ -19,7 +19,7 @@ public class ChemistryEngine : MonoBehaviour
     public static event Action<MoleculeSO> OnMoleculeFormed;
 
     // State Tracking
-    private AtomController currentlyGrabbedAtom;
+    private List<AtomController> currentlyGrabbedAtoms = new List<AtomController>();
     private MoleculeSO pendingMolecule;
     private List<AtomController> pendingAtomsToConsume = new List<AtomController>();
 
@@ -39,18 +39,20 @@ public class ChemistryEngine : MonoBehaviour
         }
     }
 
-    // --- NEW: State Management ---
     public void RegisterGrabbedAtom(AtomController atom)
     {
-        currentlyGrabbedAtom = atom;
+        if (!currentlyGrabbedAtoms.Contains(atom))
+        {
+            currentlyGrabbedAtoms.Add(atom);
+        }
     }
 
     public void ProcessAtomDrop(AtomController droppedAtom)
     {
-        if (currentlyGrabbedAtom == droppedAtom)
+        if (currentlyGrabbedAtoms.Contains(droppedAtom))
         {
-            // If we drop the atom and there is a valid preview, spawn it!
-            if (pendingMolecule != null && pendingAtomsToConsume.Count > 0)
+            // If we drop an atom that is part of a valid preview, spawn it!
+            if (pendingMolecule != null && pendingAtomsToConsume.Contains(droppedAtom))
             {
                 SpawnMolecule(
                     pendingMolecule,
@@ -59,22 +61,24 @@ public class ChemistryEngine : MonoBehaviour
                 );
             }
 
+            currentlyGrabbedAtoms.Remove(droppedAtom);
+
             // Clean up state
             ClearPreviews();
-            currentlyGrabbedAtom = null;
         }
     }
 
-    // --- NEW: Continuous Scanning ---
     private void Update()
     {
-        if (currentlyGrabbedAtom != null)
+        // Clean out any unexpectedly destroyed atoms from the list
+        currentlyGrabbedAtoms.RemoveAll(atom => atom == null);
+
+        if (currentlyGrabbedAtoms.Count > 0)
         {
             ScanForPotentialBonds();
         }
         else
         {
-            // --- NEW: Clear UI when not holding anything ---
             if (debugText != null)
             {
                 debugText.text = "Grab an atom to scan...";
@@ -84,68 +88,110 @@ public class ChemistryEngine : MonoBehaviour
 
     private void ScanForPotentialBonds()
     {
-        Collider[] colliders = Physics.OverlapSphere(
-            currentlyGrabbedAtom.transform.position,
-            bondRadius
-        );
+        List<AtomController> largestLocalCluster = new List<AtomController>();
 
-        // Only collect OTHER atoms — not the grabbed one
-        List<AtomController> otherNearbyAtoms = new List<AtomController>();
-        foreach (var col in colliders)
+        // 1. Scan the local area around EACH grabbed hand individually
+        foreach (var grabbedAtom in currentlyGrabbedAtoms)
         {
-            AtomController atom = col.GetComponent<AtomController>();
-            if (atom != null && atom != currentlyGrabbedAtom && !atom.isGrabbed)
-                otherNearbyAtoms.Add(atom);
-        }
+            List<AtomController> localCandidates = new List<AtomController>();
+            localCandidates.Add(grabbedAtom); // Center the cluster on this specific hand
 
-        // debugText.text = otherNearbyAtoms.Count().ToString();
-
-        // Now build the full candidate list: grabbed atom + others
-        List<AtomController> candidateAtoms = new List<AtomController>(otherNearbyAtoms);
-        candidateAtoms.Add(currentlyGrabbedAtom);
-
-        if (debugText != null)
-        {
-            if (otherNearbyAtoms.Count > 0)
+            // Gather physical overlaps (for atoms sitting on the table)
+            Collider[] colliders = Physics.OverlapSphere(
+                grabbedAtom.transform.position,
+                bondRadius
+            );
+            foreach (var col in colliders)
             {
-                string debugString =
-                    $"<color=green>Overlapping ({candidateAtoms.Count}):</color>\n";
-                foreach (var a in candidateAtoms)
+                AtomController atom = col.GetComponent<AtomController>();
+                if (atom != null && !localCandidates.Contains(atom))
                 {
-                    debugString += $"- {a.gameObject.name}\n";
+                    localCandidates.Add(atom);
                 }
-                debugText.text = debugString;
             }
-            else
+
+            // 2. TRUE DISTANCE CHECK: Manually check distance to the OTHER hand
+            // (This bypasses XR disabling colliders, but still enforces physical distance)
+            foreach (var otherGrabbed in currentlyGrabbedAtoms)
             {
-                debugText.text =
-                    $"<color=yellow>Scanning ({bondRadius}m)...</color>\nNo other atoms found.";
+                if (!localCandidates.Contains(otherGrabbed))
+                {
+                    float distance = Vector3.Distance(
+                        grabbedAtom.transform.position,
+                        otherGrabbed.transform.position
+                    );
+                    if (distance <= bondRadius)
+                    {
+                        localCandidates.Add(otherGrabbed);
+                    }
+                }
             }
-        }
 
-        // No other atoms nearby — clear and bail out immediately
-        if (otherNearbyAtoms.Count == 0)
-        {
-            ClearPreviews();
-            return;
-        }
-
-        foreach (MoleculeSO molecule in sortedMolecules)
-        {
-            if (CanFormMolecule(candidateAtoms, molecule, out List<AtomController> atomsToConsume))
+            // Track the largest cluster just so the Debug Text looks nice
+            if (localCandidates.Count > largestLocalCluster.Count)
             {
-                UpdatePreviews(molecule, atomsToConsume);
-                AudioManager.Instance.PlaySnap(atomsToConsume[0].transform.position);
-                return;
+                largestLocalCluster = new List<AtomController>(localCandidates);
+            }
+
+            // 3. Test if THIS specific local cluster can form a molecule
+            if (localCandidates.Count >= 2)
+            {
+                foreach (MoleculeSO molecule in sortedMolecules)
+                {
+                    // Notice we pass 'grabbedAtom' to guarantee the molecule is built around THIS hand
+                    if (
+                        CanFormMolecule(
+                            localCandidates,
+                            molecule,
+                            grabbedAtom,
+                            out List<AtomController> atomsToConsume
+                        )
+                    )
+                    {
+                        UpdateDebugUI(largestLocalCluster);
+
+                        if (pendingMolecule != molecule && AudioManager.Instance != null)
+                        {
+                            AudioManager.Instance.PlaySnap(atomsToConsume[0].transform.position);
+                        }
+
+                        UpdatePreviews(molecule, atomsToConsume);
+                        return; // Stop scanning once we find a valid match!
+                    }
+                }
             }
         }
 
+        // If we get here, no matches were found for ANY hand
+        UpdateDebugUI(largestLocalCluster);
         ClearPreviews();
+    }
+
+    private void UpdateDebugUI(List<AtomController> candidates)
+    {
+        if (debugText == null)
+            return;
+
+        if (candidates.Count > 1)
+        {
+            string debugString = $"<color=green>Near Hands ({candidates.Count}):</color>\n";
+            foreach (var a in candidates)
+            {
+                debugString += $"- {a.gameObject.name}\n";
+            }
+            debugText.text = debugString;
+        }
+        else
+        {
+            debugText.text =
+                $"<color=yellow>Scanning ({bondRadius}m)...</color>\nBring atoms closer.";
+        }
     }
 
     private bool CanFormMolecule(
         List<AtomController> availableAtoms,
         MoleculeSO molecule,
+        AtomController anchorAtom, // NEW: We enforce that this specific atom is used
         out List<AtomController> atomsToConsume
     )
     {
@@ -169,8 +215,8 @@ public class ChemistryEngine : MonoBehaviour
             }
         }
 
-        // Rule: The potential molecule MUST require the atom the player is currently holding
-        if (!atomsToConsume.Contains(currentlyGrabbedAtom))
+        // Rule: The potential molecule MUST contain the specific atom we are anchoring the scan to
+        if (!atomsToConsume.Contains(anchorAtom))
         {
             return false;
         }
@@ -178,19 +224,13 @@ public class ChemistryEngine : MonoBehaviour
         return true;
     }
 
-    // --- NEW: Visual Feedback Logic ---
     private void UpdatePreviews(MoleculeSO newPendingMolecule, List<AtomController> newPendingAtoms)
     {
-        // 1. Always turn off old outlines first to prevent getting "stuck"
         ClearPreviews();
 
-        // 2. Set new state
         pendingMolecule = newPendingMolecule;
-
-        // Create a strict COPY of the list to prevent memory reference bugs
         pendingAtomsToConsume = new List<AtomController>(newPendingAtoms);
 
-        // 3. Turn on new outlines
         foreach (var atom in pendingAtomsToConsume)
         {
             if (atom != null)
@@ -200,14 +240,12 @@ public class ChemistryEngine : MonoBehaviour
 
     private void ClearPreviews()
     {
-        // Safely turn off all current outlines
         foreach (var atom in pendingAtomsToConsume)
         {
             if (atom != null)
                 atom.SetOutline(false);
         }
 
-        // Clear the memory
         pendingAtomsToConsume.Clear();
         pendingMolecule = null;
     }
@@ -217,7 +255,6 @@ public class ChemistryEngine : MonoBehaviour
         MoleculeController.allMoleculeControllers.ToList().ForEach(item => item?.BreakApart());
     }
 
-    // --- UPDATED: Spawning ---
     private void SpawnMolecule(MoleculeSO molecule, List<AtomController> consumed, Vector3 spawnPos)
     {
         Instantiate(molecule.moleculePrefab, spawnPos, Quaternion.identity);
@@ -227,11 +264,12 @@ public class ChemistryEngine : MonoBehaviour
             AudioManager.Instance.PlayBondSound(spawnPos);
         }
 
-        // Destroy the used atoms
         foreach (var atom in consumed)
         {
-            // You can remove the aggressive XR drop fix here because the user
-            // has ALREADY dropped the atom to trigger this spawn!
+            if (currentlyGrabbedAtoms.Contains(atom))
+            {
+                currentlyGrabbedAtoms.Remove(atom);
+            }
             Destroy(atom.gameObject);
         }
 
