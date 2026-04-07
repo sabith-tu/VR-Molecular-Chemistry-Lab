@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec520b2c4e0a85e49a8a13d52b95caaf, type: 3}
+  m_Name: Hydrogen Gas H2 Molecule
+  m_EditorClassIdentifier: 
+  moleculeName: Hydrogen Gas
+  formula: H2
+  bondType: 0
+  requiredAtoms:
+  - {fileID: 11400000, guid: ed1c75cfa3fef614d8f74090e5a21773, type: 2}
+  - {fileID: 11400000, guid: ed1c75cfa3fef614d8f74090e5a21773, type: 2}
+  moleculePrefab: {fileID: 8245475009010576521, guid: aaa0f51b763548a449198055a7426d4c, type: 3}
