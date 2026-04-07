@@ -255,6 +255,19 @@ public class ChemistryEngine : MonoBehaviour
         MoleculeController.allMoleculeControllers.ToList().ForEach(item => item?.BreakApart());
     }
 
+    public void DestroyAllAtoms()
+    {
+        AtomController
+            .allAtomControllers.ToList()
+            .ForEach(item =>
+            {
+                if (item)
+                    Destroy(item.gameObject);
+            });
+    }
+
+    
+
     private void SpawnMolecule(MoleculeSO molecule, List<AtomController> consumed, Vector3 spawnPos)
     {
         Instantiate(molecule.moleculePrefab, spawnPos, Quaternion.identity);

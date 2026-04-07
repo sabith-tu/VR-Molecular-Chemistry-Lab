@@ -8,8 +8,9 @@ public class AudioManager : MonoBehaviour
     [Tooltip("Assign an AudioClip for successful bond formation")]
     public AudioClip sfx_bondSuccess,
         sfx_break,
-        sfx_snap;
+        sfx_snap, sfx_atomCreated;
     private AudioSource audioSource;
+    Transform cameraTransform;
 
     private void Awake()
     {
@@ -21,6 +22,11 @@ public class AudioManager : MonoBehaviour
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
         audioSource.spatialBlend = 1f; // 3D sound for VR
+    }
+
+    void Start()
+    {
+        cameraTransform = Camera.main.transform;
     }
 
     public void PlayBondSound(Vector3 position)
@@ -51,5 +57,11 @@ public class AudioManager : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
             canPlaySnapSoundAgain = true;
         }
+    }
+
+    public void PlayAtomCreated(Vector3 position)
+    {
+        if (sfx_atomCreated != null)
+            AudioSource.PlayClipAtPoint(sfx_atomCreated, position);
     }
 }

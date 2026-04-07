@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
 
     private void OnEnable()
     {
+        libraryText.text = "Discovered Molecules";
         ChemistryEngine.OnMoleculeFormed += HandleMoleculeFormed;
     }
 
@@ -33,5 +34,11 @@ public class UIManager : MonoBehaviour
         {
             libraryText.text += $"- {mol}\n";
         }
+    }
+
+    public void ResetDiscovery()
+    {
+        discoveredMolecules.Clear();
+        libraryText.text = "Discovered Molecules";
     }
 }
