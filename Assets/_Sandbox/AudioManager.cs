@@ -8,7 +8,7 @@ public class AudioManager : MonoBehaviour
     [Tooltip("Assign an AudioClip for successful bond formation")]
     public AudioClip sfx_bondSuccess,
         sfx_break,
-        sfx_snap, sfx_atomCreated;
+        sfx_snap, sfx_atomCreated,sfx_reset;
     private AudioSource audioSource;
     Transform cameraTransform;
 
@@ -63,5 +63,11 @@ public class AudioManager : MonoBehaviour
     {
         if (sfx_atomCreated != null)
             AudioSource.PlayClipAtPoint(sfx_atomCreated, position);
+    }
+
+    public void PlayReset(Vector3 position)
+    {
+        if (sfx_reset != null)
+            AudioSource.PlayClipAtPoint(sfx_reset, position);
     }
 }

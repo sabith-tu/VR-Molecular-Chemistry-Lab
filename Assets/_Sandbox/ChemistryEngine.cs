@@ -252,11 +252,13 @@ public class ChemistryEngine : MonoBehaviour
 
     public void ResetAllMolecules()
     {
+        AudioManager.Instance.PlayReset(transform.position);
         MoleculeController.allMoleculeControllers.ToList().ForEach(item => item?.BreakApart());
     }
 
     public void DestroyAllAtoms()
     {
+        AudioManager.Instance.PlayReset(transform.position);
         AtomController
             .allAtomControllers.ToList()
             .ForEach(item =>
@@ -274,7 +276,7 @@ public class ChemistryEngine : MonoBehaviour
             Quaternion.identity
         );
         spawnedMolecule.transform.localScale = Vector3.one * 0.1f;
-        
+
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayBondSound(spawnPos);
