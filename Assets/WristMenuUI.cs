@@ -51,6 +51,17 @@ public class WristMenuUI : MonoBehaviour
                     Quaternion.identity
                 );
 
+                // --- DOTWEEN ATOM SPAWN ANIMATION ---
+                // 1. Save the prefab's original scale so we know how big it should be
+                Vector3 originalScale = spawnedAtom.transform.localScale;
+
+                // 2. Shrink it down to nothing instantly
+                spawnedAtom.transform.localScale = Vector3.zero;
+
+                // 3. Animate it scaling back up to its original size over 0.4 seconds.
+                // Ease.OutBack gives it a slight "overshoot" bounce before settling perfectly still.
+                spawnedAtom.transform.DOScale(originalScale, 0.4f).SetEase(Ease.OutBack);
+
                 AudioManager.Instance.PlayAtomCreated(spawnedAtom.transform.position);
             });
         }

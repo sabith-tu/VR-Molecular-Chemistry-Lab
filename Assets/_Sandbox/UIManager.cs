@@ -22,7 +22,29 @@ public class UIManager : MonoBehaviour
     private void OnEnable()
     {
         originalTextColor = libraryText.color;
-        libraryText.text = "Discovered Molecules";
+
+        // 1. Set the new formatted text
+        // Using \n for line breaks and escaping the quotes around \"Cheat Sheet\"
+        libraryText.text =
+            "<size=120%><b>Welcome to your Library</b></size>\n\n"
+            + "• <b>Your Goal:</b> This space tracks your progress, but it is currently empty.\n"
+            + "• <b>Gather Atoms:</b> Use the atoms already in the scene, or press your wrist menu buttons to spawn more.\n"
+            + "• <b>How to Discover:</b> Use your grip buttons to grab atoms with either hand. Push compatible atoms together to create a molecule. It will automatically save here.\n"
+            + "• <b>Need a Hint?:</b> Select <color=#FFD700>\"Cheat Sheet\"</color> in the drop-down menu on the <b>right wall</b> to see all possible molecules.";
+
+        // 2. Animate with DOTween
+        // Set alpha to 0 so it starts invisible
+        libraryText.color = new Color(
+            originalTextColor.r,
+            originalTextColor.g,
+            originalTextColor.b,
+            0f
+        );
+
+        // Fade alpha back to its original state over 1.5 seconds
+        libraryText.DOFade(originalTextColor.a, 3f).SetEase(Ease.InOutSine).SetDelay(1);
+
+        // 3. Re-establish listeners
         ChemistryEngine.OnMoleculeFormed += HandleMoleculeFormed;
         secondPanelType.onValueChanged.AddListener(OnSecondPanelTypeChange);
     }

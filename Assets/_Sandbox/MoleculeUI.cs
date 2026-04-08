@@ -6,7 +6,7 @@ public class MoleculeUI : MonoBehaviour
 {
     [Header("Settings")]
     [Tooltip("How high above the molecule the text should float")]
-     float baseHeightOffset = 0.15f;
+    float baseHeightOffset = 0.15f;
 
     private MoleculeController parentMolecule;
     private TextMeshPro detailsText;
@@ -30,7 +30,7 @@ public class MoleculeUI : MonoBehaviour
             detailsText.text =
                 $"<b><color=#5CE1E6>{data.moleculeName}</color></b> <color=#DDDDDD>({data.formula})</color>\n"
                 + $"<size=70%><color=#A0A0A0>{data.bondType} Bond</color>\n"
-                + $"<color=#FF5757>Hold Trigger to Break</color></size>";
+                + $"<color=#FF5757>Grab and Press Trigger to Break</color></size>";
         }
 
         // Reset local transforms just to be safe before animating
