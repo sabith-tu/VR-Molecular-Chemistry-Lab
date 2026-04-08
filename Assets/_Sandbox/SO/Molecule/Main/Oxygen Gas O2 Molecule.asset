@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec520b2c4e0a85e49a8a13d52b95caaf, type: 3}
+  m_Name: Oxygen Gas O2 Molecule
+  m_EditorClassIdentifier: 
+  moleculeName: Oxygen Gas
+  formula: O2
+  bondType: 1
+  requiredAtoms:
+  - {fileID: 11400000, guid: 2ecfbee45a61f19498896eeea1bfa4c6, type: 2}
+  - {fileID: 11400000, guid: 2ecfbee45a61f19498896eeea1bfa4c6, type: 2}
+  moleculePrefab: {fileID: 2864050602363458704, guid: 7a3238fecc523394ea01acc66fb350f7, type: 3}

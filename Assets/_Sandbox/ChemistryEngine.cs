@@ -266,12 +266,15 @@ public class ChemistryEngine : MonoBehaviour
             });
     }
 
-    
-
     private void SpawnMolecule(MoleculeSO molecule, List<AtomController> consumed, Vector3 spawnPos)
     {
-        Instantiate(molecule.moleculePrefab, spawnPos, Quaternion.identity);
-
+        GameObject spawnedMolecule = Instantiate(
+            molecule.moleculePrefab,
+            spawnPos,
+            Quaternion.identity
+        );
+        spawnedMolecule.transform.localScale = Vector3.one * 0.1f;
+        
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayBondSound(spawnPos);

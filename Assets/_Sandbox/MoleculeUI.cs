@@ -25,7 +25,7 @@ public class MoleculeUI : MonoBehaviour
         {
             MoleculeSO data = parentMolecule.moleculeData;
             detailsText.text =
-                $"{data.moleculeName}\nFormula: {data.formula}\nBond: {data.bondType}";
+                $"{data.moleculeName}\nFormula: {data.formula}\nBond: {data.bondType}\nHold and press Trigger to Break the module";
         }
     }
 

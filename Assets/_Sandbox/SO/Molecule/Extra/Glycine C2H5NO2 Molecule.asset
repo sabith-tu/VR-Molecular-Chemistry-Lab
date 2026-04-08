@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec520b2c4e0a85e49a8a13d52b95caaf, type: 3}
+  m_Name: Glycine C2H5NO2 Molecule
+  m_EditorClassIdentifier: 
+  moleculeName: Glycine
+  formula: C2H5NO2
+  bondType: 0
+  requiredAtoms:
+  - {fileID: 11400000, guid: 96a51480669d3f140aca14199a294cf1, type: 2}
+  - {fileID: 11400000, guid: 96a51480669d3f140aca14199a294cf1, type: 2}
+  - {fileID: 11400000, guid: ed1c75cfa3fef614d8f74090e5a21773, type: 2}
+  - {fileID: 11400000, guid: ed1c75cfa3fef614d8f74090e5a21773, type: 2}
+  - {fileID: 11400000, guid: ed1c75cfa3fef614d8f74090e5a21773, type: 2}
+  - {fileID: 11400000, guid: ed1c75cfa3fef614d8f74090e5a21773, type: 2}
+  - {fileID: 11400000, guid: ed1c75cfa3fef614d8f74090e5a21773, type: 2}
+  - {fileID: 11400000, guid: cda0bcdb664d16440b5076434ea6ee1f, type: 2}
+  - {fileID: 11400000, guid: 2ecfbee45a61f19498896eeea1bfa4c6, type: 2}
+  - {fileID: 11400000, guid: 2ecfbee45a61f19498896eeea1bfa4c6, type: 2}
+  moleculePrefab: {fileID: 2706608631600741172, guid: 3df8c55140734a04ca68f97bd11c8961, type: 3}
